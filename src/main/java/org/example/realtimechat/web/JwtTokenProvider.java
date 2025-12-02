@@ -1,5 +1,6 @@
 package org.example.realtimechat.web;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -40,5 +41,27 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)  // 토큰 문자열 발급
                 .compact();                               // 최종 토큰 문자열받기
 
+    }
+
+    // 토큰이 만료 또는 위조되었는지 확인하는 매서드
+    public boolean validate(String token) {
+        try{
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    //사용자의 정보를 꺼내가는 매서드
+    public Claims parse(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

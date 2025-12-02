@@ -1,11 +1,14 @@
 package org.example.realtimechat.domain.user;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "users")
+@NoArgsConstructor
 public class User {
 
     @Id

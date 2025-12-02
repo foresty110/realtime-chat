@@ -1,5 +1,6 @@
 package org.example.realtimechat.web;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.example.realtimechat.domain.user.Role;
 import org.example.realtimechat.service.UserService;
@@ -33,5 +34,18 @@ public class AuthController {
     public String login(@RequestBody LoginRequest loginRequest) {
        String response = jwtTokenProvider.createAccessToken(1L,loginRequest.getEmail(), Role.USER);
        return response;
+    }
+
+    @GetMapping("/test")
+    public String test(
+            @RequestHeader("Authorization") String authorization
+    ){
+        // "Bearer {accessToken} -> 실제 부분만 추출해야함
+        String token = authorization.replace("Bearer ", "");
+
+        //userId 가져오기
+        Claims claims = jwtTokenProvider.parse(token);
+        String email = claims.get("email", String.class);
+        return "email = " +email;
     }
 }
