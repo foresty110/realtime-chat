@@ -1,6 +1,7 @@
 package org.example.realtimechat.web;
 
 import lombok.RequiredArgsConstructor;
+import org.example.realtimechat.domain.user.Role;
 import org.example.realtimechat.service.UserService;
 import org.example.realtimechat.web.dto.LoginRequest;
 import org.example.realtimechat.web.dto.SignRequest;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     //회원가입시 데이터 가져오기
     @PostMapping("/signup")
@@ -28,6 +31,7 @@ public class AuthController {
     //로그인시 데이터 가져오기
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest loginRequest) {
-        return "login";
+       String response = jwtTokenProvider.createAccessToken(1L,loginRequest.getEmail(), Role.USER);
+       return response;
     }
 }
