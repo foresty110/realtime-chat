@@ -17,10 +17,10 @@ export default function LoginPages() {
         const res = await loginApi(login);
 
         //로컬 스토리지에 저장한다
-        localStorage.setItem("accessToken",res.toekn)
+        localStorage.setItem("accessToken",res.token)
         localStorage.setItem("userId",res.userId)
         
-        console.log(res)
+        console.log(res.userId);
         alert("로그인 성공!");
         navigate("/rooms");
     }catch(err){
