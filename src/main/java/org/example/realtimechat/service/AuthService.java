@@ -5,10 +5,11 @@ import org.example.realtimechat.domain.user.User;
 import org.example.realtimechat.domain.user.UserRepository;
 import org.example.realtimechat.web.JwtTokenProvider;
 import org.example.realtimechat.web.dto.LoginRequest;
+import org.example.realtimechat.web.dto.TokenResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
+@Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
@@ -16,7 +17,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     //이메일 찾기
-    public String login(LoginRequest loginRequest) {
+    public TokenResponse login(LoginRequest loginRequest) {
 
         //user 정보가 없을 경우 예외처리
         User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(
@@ -30,10 +31,10 @@ public class AuthService {
         }
 
         //토큰 발급
-        return jwtTokenProvider.createAccessToken(
-                user.getId(),
+        String token = jwtTokenProvider.createAccessToken(user.getId(),
                 user.getEmail(),
-                user.getRole()
-        );
+                user.getRole());
+        return new TokenResponse(token,user.getId());
+
     }
 }

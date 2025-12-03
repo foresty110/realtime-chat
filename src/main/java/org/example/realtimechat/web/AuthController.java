@@ -2,19 +2,21 @@ package org.example.realtimechat.web;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.example.realtimechat.domain.user.Role;
+import org.example.realtimechat.service.AuthService;
 import org.example.realtimechat.service.UserService;
 import org.example.realtimechat.web.dto.LoginRequest;
 import org.example.realtimechat.web.dto.SignRequest;
+import org.example.realtimechat.web.dto.TokenResponse;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
-
+    private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
 
     //회원가입시 데이터 가져오기
@@ -31,8 +33,11 @@ public class AuthController {
 
     //로그인시 데이터 가져오기
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
-       String response = jwtTokenProvider.createAccessToken(1L,loginRequest.getEmail(), Role.USER);
+    public TokenResponse login(@RequestBody LoginRequest loginRequest) {
+        TokenResponse response = authService.login(loginRequest);
+
+        System.out.println("login. token :"+ response.toString());
+
        return response;
     }
 
