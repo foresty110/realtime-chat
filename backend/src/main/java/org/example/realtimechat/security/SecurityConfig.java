@@ -32,6 +32,8 @@ public class SecurityConfig {
                 .addFilterBefore(new UrlCheckFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth->
                         auth.requestMatchers("/api/auth/**").permitAll()
+                                //웹 소켓 연결 url 시큐리티에서 허용하도록 설정
+                                .requestMatchers("/ws/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 //폼 로그인 필터보다 먼저 jwt를 검사해서 사용자를 인증상태로 만들겠다.

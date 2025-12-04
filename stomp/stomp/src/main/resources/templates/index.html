@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>STOMP TEST</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+    <style>
+        #logBox {
+            width: 600px;
+            height: 250px;
+            border: 1px solid #444;
+            padding: 10px;
+            overflow-y: auto;
+            margin-top: 15px;
+            font-family: Consolas, monospace;
+            background: #f7f7f7;
+        }
+        .ok { color: green; }
+        .err { color: red; }
+    </style>
+</head>
+<body>
+
+<h2>WebSocket + STOMP Simple Test</h2>
+
+<button onclick="connect()">CONNECT</button>
+<button onclick="sendMsg()">SEND</button>
+
+<div id="logBox"></div>
+
+<script>
+    let stompClient = null;
+
+    const logBox = document.getElementById("logBox");
+
+    function log(msg, type = "ok") {
+        const p = document.createElement("p");
+        p.className = type;
+        p.innerText = msg;
+        logBox.appendChild(p);
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function connect() {
+        log("🔌 CONNECT 시도 중...", "ok");
+
+        const socket = new SockJS("http://localhost:8080/ws/chat");
+        // 웹 소켓위에 스톰프 프로토콜을 얹어서 사용하라
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect(
+            {
+                // Authorization: "Bearer xxxxxx"
+            },
+            (frame) => {
+                console.log("CONNECTED ✔", frame);
+                log("🟢 CONNECTED 성공!", "ok");
+
+                stompClient.subscribe("/sub/chat/room/1", (msg) => {
+                    log("📩 메시지 수신: " + msg.body, "ok");
+                });
+            },
+            (error) => {
+                console.log("연결 실패 ❌", error);
+                log("🔴 CONNECT 실패: " + error, "err");
+            }
+        );
+    }
+
+    function sendMsg() {
+        if (!stompClient) {
+            log("⚠️ 먼저 CONNECT 해!", "err");
+            return;
+        }
+
+        const body = {
+            roomId: 1,
+            content: "테스트 메시지!",
+        };
+
+        stompClient.send("/pub/chat/message", {}, JSON.stringify(body));
+
+        log("📤 SEND 완료 → /pub/chat/message", "ok");
+    }
+</script>
+
+</body>
+</html>
